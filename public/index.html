@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webremote</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="mobile-web-app-capable" content="yes">
+    <style type="text/css">
+        .row-container {
+            width: 100%;
+            display: table;
+            table-layout: fixed;
+            height: 15%;
+            max-height: 3em;
+            min-height: 2.5em;
+            min-width: 35em;
+        }
+
+        .row-0 {
+            height: 12%;
+            max-height: 1.8em;
+        }
+
+        .child-container {
+            border: 1px solid transparent;
+            display: table-cell;
+            text-align: center;
+        }
+
+        button {
+          font-size: 0.8em;
+          border-radius: 10px;
+          border: 1px solid #cccccc;
+          background: #efefef;
+          padding: 0;
+        }
+
+        #keyboard-container button {
+            width: 100%;
+            height: 100%;
+        }
+
+        body, html, #button-container {
+            height: 99%;
+            margin: 0;
+        }
+
+        #button-container {
+            max-width: 70em;
+            margin: auto;
+        }
+
+        #keyboard-container {
+            margin: 10px;
+        }
+
+        #mouse-container div {
+            text-align: center;
+        }
+
+        #mouse-container button {
+            width: 15%;
+            min-height: 2.5em;
+        }
+
+        .class-for-backspace, .class-for-enter {
+            width: 14%;
+        }
+
+        .class-for-space {
+            width: 30%;
+        }
+
+        .class-for-shift {
+            width: 16%;
+        }
+
+        .class-for-caps {
+            width: 12%;
+        }
+
+        .class-for-tab {
+            width: 10%;
+        }
+
+        button.selected {
+            background: #cccccc;
+            color: #ffffff;
+            border: 1px solid #efefef!important
+        }
+
+        #track-pad {
+          border-radius: 5px;
+          background: #cccccc;
+          height: 200px;
+          width: 300px;
+          margin:auto;
+        }
+
+        #mouse-container .buttons {
+          min-width: 300px;
+        }
+
+        #mouse-container .buttons button {
+          width: 90px;
+        }
+
+        @media (max-width: 600px) {
+            button {
+              font-size: 0.6em;
+            }
+            .row-container {
+              min-width: 20em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="button-container">
+  <div id="keyboard-container"></div>
+  <div id="mouse-container">
+      <div>
+        <div id="track-pad"></div>
+      </div>
+      <div class="buttons">
+        <button id="button1">&nbsp;</button>
+        <button id="button2">&nbsp;</button>
+        <button id="button3">&nbsp;</button>
+      </div>
+  </div>
+</div>
+<script src="js/communication-handler.js"></script>
+<script src="js/keyboard-handler.js"></script>
+<script src="js/touch-handler.js"></script>
+<script>
+
+    window.onload = function () {
+      var buttonContainer = document.getElementById("keyboard-container");
+      var communication = communicationHandler("ws://192.168.1.100:8000/echo");
+
+      keyboardHandler(communication, buttonContainer);
+
+      touchHandler(document.getElementById('track-pad'), communication);
+
+      var mouseAction = function (action) {
+          communication.send({
+            type: "mouseclick",
+            commands: [action]
+          });
+      };
+
+      document.getElementById("button1").addEventListener("click", function () { mouseAction("1"); });
+      document.getElementById("button2").addEventListener("click", function () { mouseAction("2"); });
+      document.getElementById("button3").addEventListener("click", function () { mouseAction("3"); });
+    };
+
+</script>
+</body>
+</html>
