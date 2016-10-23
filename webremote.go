@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/claudiu-persoiu/webremote/input"
-
 	"golang.org/x/net/websocket"
 )
 
@@ -164,9 +162,6 @@ func main() {
 	flag.Parse()
 
 	websocketPath := "/echo"
-
-	keyboardHandler := input.NewKeyboard()
-	fmt.Println(keyboardHandler)
 
 	data := &PageData{Title: "Web remote", Address: *address + websocketPath}
 
