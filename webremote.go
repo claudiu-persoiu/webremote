@@ -3,11 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/claudiu-persoiu/webremote/input"
 
 	"golang.org/x/net/websocket"
 )
@@ -21,6 +24,11 @@ type Message struct {
 	Type     string
 	Commands []string `json:"commands,omitempty"`
 	Offset   Offset   `json:"offset,omitempty"`
+}
+
+type PageData struct {
+	Title   string
+	Address string
 }
 
 func handleWebSocket(path string, commands chan Message) {
@@ -134,19 +142,45 @@ func commandsDispatcher(messages chan Message, keyboard chan Message, mouseMove 
 	}
 }
 
-var address = flag.String("addr", ":8000", "http service address")
+func mainHandler(data *PageData) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		t, err := template.ParseFiles("public/index.html")
+
+		if err != nil {
+			log.Panic(err)
+		}
+
+		err = t.Execute(w, *data)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+var address = flag.String("addr", "localhost:8000", "http service address")
 
 func main() {
 	flag.Parse()
 
-	http.Handle("/", http.FileServer(http.Dir("public")))
+	websocketPath := "/echo"
+
+	keyboardHandler := input.NewKeyboard()
+	fmt.Println(keyboardHandler)
+
+	data := &PageData{Title: "Web remote", Address: *address + websocketPath}
+
+	http.HandleFunc("/", mainHandler(data))
+	http.Handle("/js/", http.FileServer(http.Dir("public")))
 	messages := make(chan Message)
 	keyboard := make(chan Message)
 	mouseMove := make(chan Message)
 	mouseClick := make(chan Message)
 	commands := make(chan string)
 
-	handleWebSocket("/echo", messages)
+	handleWebSocket(websocketPath, messages)
+
+	// https://jan.newmarch.name/go/template/chapter-template.html
 
 	go commandsDispatcher(messages, keyboard, mouseMove, mouseClick)
 	go buildKeyboardCommands(keyboard, commands)

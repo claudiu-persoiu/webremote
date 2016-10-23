@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Webremote</title>
+    <title>{{.Title}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta name="mobile-web-app-capable" content="yes">
     <style type="text/css">
@@ -137,7 +137,7 @@
 
     window.onload = function () {
       var buttonContainer = document.getElementById("keyboard-container");
-      var communication = communicationHandler("ws://192.168.1.100:8000/echo");
+      var communication = communicationHandler("ws://{{.Address}}");
 
       keyboardHandler(communication, buttonContainer);
 
