@@ -21,7 +21,7 @@ func TestKeyboardCommands(t *testing.T) {
 		keyboard <- command
 	}
 
-	testKeyboard := []byte("[[{\"default\":\"x\",\"shift\":\"X\",\"caps\":\"X\"},{\"default\":\"y\",\"shift\":\"Y\",\"caps\":\"Y\"},{\"default\":\"z\",\"shift\":\"Z\",\"caps\":\"Z\"},{\"default\":\"&darr;\",\"execute\":\"Down\"}]]");
+	testKeyboard := []byte("[[{\"default\":\"x\",\"shift\":\"X\",\"caps\":\"X\"},{\"default\":\"y\",\"shift\":\"Y\",\"caps\":\"Y\"},{\"default\":\"z\",\"shift\":\"Z\",\"caps\":\"Z\"},{\"default\":\"&darr;\",\"execute\":\"Down\"}]]")
 
 	go KeyboardCommands(keyboard, commands, structure.NewKeyboard(testKeyboard))
 

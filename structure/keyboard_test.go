@@ -6,7 +6,7 @@ import (
 
 func TestNewKeyboard(t *testing.T) {
 
-	jsonTest := "[[{\"default\":\"p\",\"shift\":\"P\",\"caps\":\"P\"},{\"default\":\"Enter\",\"execute\":\"Return\"}],[{\"default\":\"x\",\"shift\":\"X\",\"caps\":\"X\"}]]";
+	jsonTest := "[[{\"default\":\"p\",\"shift\":\"P\",\"caps\":\"P\"},{\"default\":\"Enter\",\"execute\":\"Return\"}],[{\"default\":\"x\",\"shift\":\"X\",\"caps\":\"X\"}]]"
 
 	k := NewKeyboard([]byte(jsonTest))
 
