@@ -1,10 +1,10 @@
 package builder
 
 import (
-	"testing"
-	"github.com/claudiu-persoiu/webremote/structure"
-	"time"
 	"fmt"
+	"github.com/claudiu-persoiu/webremote/structure"
+	"testing"
+	"time"
 )
 
 func TestDispatcher(t *testing.T) {
@@ -26,7 +26,6 @@ func TestDispatcher(t *testing.T) {
 
 	expectedMouseMove := []structure.Offset{structure.Offset{X: 1, Y: 2},
 		structure.Offset{X: 4, Y: 0}}
-
 
 	messages := make(chan structure.Message, len(inputCommands))
 	keyboard := make(chan []string, len(expectedKeyboard))

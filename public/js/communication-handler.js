@@ -1,17 +1,25 @@
-var communicationHandler = function (url) {
-    var socket = new WebSocket(url), socketOpened = false;
+var communicationHandler = function (url, errorBlock) {
+    var socket, socketOpened = false;
 
-    socket.onopen = function (e) {
-        socketOpened = true;
+    var connect = function () {
+        socket = new WebSocket(url);
+
+        socket.onopen = function () {
+            socketOpened = true;
+            errorBlock.style.display = 'none';
+        };
+
+        socket.onmessage = function (event) {
+            console.log(event.data);
+        };
+
+        socket.onclose = function () {
+            socketOpened = false;
+            errorBlock.style.display = 'block';
+        };
     };
 
-    socket.onmessage = function (event) {
-        console.log(event.data);
-    };
-
-    socket.onclose = function () {
-        socketOpened = false;
-    };
+    connect();
 
     return {
         send: function (message) {
@@ -22,6 +30,9 @@ var communicationHandler = function (url) {
         },
         isConnected: function () {
             return socketOpened;
+        },
+        reconnect: function () {
+            connect();
         }
     };
 };

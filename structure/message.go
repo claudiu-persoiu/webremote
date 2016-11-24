@@ -1,6 +1,5 @@
 package structure
 
-
 type Offset struct {
 	X int `json:"x"`
 	Y int `json:"y"`

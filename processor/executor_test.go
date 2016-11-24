@@ -1,14 +1,14 @@
 package processor
 
 import (
-	"testing"
-	"os/exec"
-	"os"
 	"fmt"
+	"os"
+	"os/exec"
+	"testing"
 	"time"
 )
 
-func fakeExecCommand(command string, args...string) *exec.Cmd {
+func fakeExecCommand(command string, args ...string) *exec.Cmd {
 	cs := []string{"-test.run=TestHelperProcess", "--", command}
 	cs = append(cs, args...)
 	cmd := exec.Command(os.Args[0], cs...)
@@ -18,9 +18,9 @@ func fakeExecCommand(command string, args...string) *exec.Cmd {
 
 func TestProcessCommands(t *testing.T) {
 	lineToPrint := ""
-	execCommand = fakeExecCommand;
+	execCommand = fakeExecCommand
 	logLine = func(lines ...interface{}) (int, error) {
-		if line, ok := lines[len(lines) - 1].(string); ok {
+		if line, ok := lines[len(lines)-1].(string); ok {
 			lineToPrint = line
 		}
 		return 0, nil
@@ -34,9 +34,9 @@ func TestProcessCommands(t *testing.T) {
 	command := "multiple arguments"
 	expectedResult := "xdotool " + command
 	commands := make(chan string, 1)
-	commands<-command
+	commands <- command
 
-	go ProcessCommands(commands);
+	go ProcessCommands(commands)
 
 	time.Sleep(time.Millisecond + 10)
 	if lineToPrint != expectedResult {

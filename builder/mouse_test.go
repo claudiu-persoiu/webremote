@@ -1,8 +1,8 @@
 package builder
 
 import (
-	"testing"
 	"github.com/claudiu-persoiu/webremote/structure"
+	"testing"
 	"time"
 )
 

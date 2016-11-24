@@ -1,13 +1,13 @@
 package processor
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
-	"fmt"
 )
 
-var execCommand = exec.Command;
-var logLine = fmt.Println;
+var execCommand = exec.Command
+var logLine = fmt.Println
 
 func ProcessCommands(commands chan string) {
 	for {

@@ -105,6 +105,13 @@
           width: 90px;
         }
 
+        #not-connected {
+            color: #ffffff;
+            background: #ff0000;
+            text-align: center;
+            display: none;
+        }
+
         @media (max-width: 600px) {
             button {
               font-size: 0.6em;
@@ -116,7 +123,7 @@
     </style>
 </head>
 <body>
-
+<div id="not-connected">Not connected. Retry?</div>
 <div id="button-container">
   <div id="keyboard-container"></div>
   <div id="mouse-container">
@@ -136,25 +143,33 @@
 <script>
 
     window.onload = function () {
-      var buttonContainer = document.getElementById("keyboard-container");
-      var communication = communicationHandler("ws://{{.Address}}");
+        var buttonContainer = document.getElementById("keyboard-container");
 
-      keyboardHandler(communication, buttonContainer);
+        var errorBlock = document.getElementById("not-connected");
 
-      touchHandler(document.getElementById('track-pad'), communication);
+        errorBlock.onclick = function () {
+            communication.reconnect();
+        };
 
-      var mouseAction = function (action) {
-          communication.send({
-            type: "mouseclick",
-            commands: [action]
-          });
-      };
+        var communication = communicationHandler("ws://{{.Address}}", errorBlock);
 
-      document.getElementById("button1").addEventListener("click", function () { mouseAction("1"); });
-      document.getElementById("button2").addEventListener("click", function () { mouseAction("2"); });
-      document.getElementById("button3").addEventListener("click", function () { mouseAction("3"); });
+        keyboardHandler(communication, buttonContainer, JSON.parse({{.Keyboard}}));
+
+        touchHandler(document.getElementById('track-pad'), communication);
+
+        var mouseAction = function (action) {
+            communication.send({
+              type: "mouseclick",
+              commands: [action]
+            });
+        };
+
+        document.getElementById("button1").addEventListener("click", function () { mouseAction("1"); });
+        document.getElementById("button2").addEventListener("click", function () { mouseAction("2"); });
+        document.getElementById("button3").addEventListener("click", function () { mouseAction("3"); });
     };
 
 </script>
+
 </body>
 </html>

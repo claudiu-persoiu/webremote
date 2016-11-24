@@ -3,14 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/claudiu-persoiu/webremote/builder"
 	"github.com/claudiu-persoiu/webremote/processor"
 	"github.com/claudiu-persoiu/webremote/structure"
-	"github.com/claudiu-persoiu/webremote/builder"
 	"html/template"
 	"log"
 	"net/http"
 
 	"golang.org/x/net/websocket"
+	"io/ioutil"
 )
 
 func handleWebSocket(path string, commands chan structure.Message) {
@@ -62,24 +63,32 @@ func main() {
 
 	websocketPath := "/echo"
 
-	data := &structure.PageData{Title: "Web remote", Address: *address + websocketPath}
+	keyboardData, err := ioutil.ReadFile("keyboard/default.json")
+
+	if err != nil {
+		log.Fatal("Could not read keyboard file")
+	}
+
+	keyboard := structure.NewKeyboard(keyboardData)
+
+	data := &structure.PageData{Title: "Web remote", Address: *address + websocketPath, Keyboard: keyboard.GetJSON()}
 
 	http.HandleFunc("/", mainHandler(data))
 	http.Handle("/js/", http.FileServer(http.Dir("public")))
 
-	messages := make(chan structure.Message)
-	keyboard := make(chan []string)
-	mouseMove := make(chan structure.Offset)
-	mouseClick := make(chan string)
-	commands := make(chan string)
+	messagesChan := make(chan structure.Message)
+	keyboardChan := make(chan []string)
+	mouseMoveChan := make(chan structure.Offset)
+	mouseClickChan := make(chan string)
+	commandsChan := make(chan string)
 
-	handleWebSocket(websocketPath, messages)
+	handleWebSocket(websocketPath, messagesChan)
 
-	go builder.Dispatcher(messages, keyboard, mouseMove, mouseClick)
-	go builder.KeyboardCommands(keyboard, commands)
-	go builder.MouseClickCommands(mouseClick, commands)
-	go builder.MouseMoveCommands(mouseMove, commands)
-	go processor.ProcessCommands(commands)
+	go builder.Dispatcher(messagesChan, keyboardChan, mouseMoveChan, mouseClickChan)
+	go builder.KeyboardCommands(keyboardChan, commandsChan, keyboard)
+	go builder.MouseClickCommands(mouseClickChan, commandsChan)
+	go builder.MouseMoveCommands(mouseMoveChan, commandsChan)
+	go processor.ProcessCommands(commandsChan)
 	log.Printf("Starting listtening on %s... \n", *address)
 	log.Fatal(http.ListenAndServe(*address, nil))
 }
