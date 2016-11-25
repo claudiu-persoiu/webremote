@@ -28,11 +28,11 @@
         }
 
         button {
-          font-size: 0.8em;
-          border-radius: 10px;
-          border: 1px solid #cccccc;
-          background: #efefef;
-          padding: 0;
+            font-size: 0.8em;
+            border-radius: 10px;
+            border: 1px solid #cccccc;
+            background: #efefef;
+            padding: 0;
         }
 
         #keyboard-container button {
@@ -90,19 +90,20 @@
         }
 
         #track-pad {
-          border-radius: 5px;
-          background: #cccccc;
-          height: 200px;
-          width: 300px;
-          margin:auto;
+            border-radius: 5px;
+            background: #cccccc;
+            height: 200px;
+            width: 300px;
+            margin:auto;
         }
 
         #mouse-container .buttons {
-          min-width: 300px;
+            min-width: 300px;
+            padding-top: 4px;
         }
 
         #mouse-container .buttons button {
-          width: 90px;
+            width: 90px;
         }
 
         #not-connected {
@@ -112,12 +113,24 @@
             display: none;
         }
 
+        .scroll-buttons {
+            float: right;
+            width: 35px;
+            margin-top: 2px;
+            margin-right: 2px;
+        }
+
+        .scroll-buttons button {
+            width: 100% !important;
+            height: 96px;
+        }
+
         @media (max-width: 600px) {
             button {
-              font-size: 0.6em;
+                font-size: 0.6em;
             }
             .row-container {
-              min-width: 20em;
+                min-width: 20em;
             }
         }
     </style>
@@ -128,7 +141,11 @@
   <div id="keyboard-container"></div>
   <div id="mouse-container">
       <div>
-        <div id="track-pad"></div>
+        <div id="track-pad">
+            <div class="scroll-buttons">
+                <button id="scroll-up"> </button><button id="scroll-down"> </button>
+            </div>
+        </div>
       </div>
       <div class="buttons">
         <button id="button1">&nbsp;</button>
@@ -167,6 +184,8 @@
         document.getElementById("button1").addEventListener("click", function () { mouseAction("1"); });
         document.getElementById("button2").addEventListener("click", function () { mouseAction("2"); });
         document.getElementById("button3").addEventListener("click", function () { mouseAction("3"); });
+        document.getElementById("scroll-up").addEventListener("click", function () { mouseAction("4"); });
+        document.getElementById("scroll-down").addEventListener("click", function () { mouseAction("5"); });
     };
 
 </script>
