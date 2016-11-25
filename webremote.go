@@ -40,7 +40,7 @@ func handleWebSocket(path string, commands chan structure.Message) {
 	http.Handle(path, websocket.Handler(wsHandler))
 }
 
-func mainHandler(data *structure.PageData) func(http.ResponseWriter, *http.Request) {
+func mainPageHandler(data *structure.PageData) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		t, err := template.ParseFiles("public/index.html")
 
@@ -56,6 +56,32 @@ func mainHandler(data *structure.PageData) func(http.ResponseWriter, *http.Reque
 	}
 }
 
+func handleWebServer(page *structure.PageData) {
+	http.HandleFunc("/", mainPageHandler(page))
+	http.Handle("/js/", http.FileServer(http.Dir("public")))
+}
+
+func handleMessageBuilders(messagesChan chan structure.Message, commandsChan chan string, keyboard *structure.Keyboard) {
+	keyboardChan := make(chan []string)
+	mouseMoveChan := make(chan structure.Offset)
+	mouseClickChan := make(chan string)
+
+	go builder.Dispatcher(messagesChan, keyboardChan, mouseMoveChan, mouseClickChan)
+	go builder.KeyboardCommands(keyboardChan, commandsChan, keyboard)
+	go builder.MouseClickCommands(mouseClickChan, commandsChan)
+	go builder.MouseMoveCommands(mouseMoveChan, commandsChan)
+}
+
+func buildKeyboard(file string) *structure.Keyboard {
+	keyboardData, err := ioutil.ReadFile(file)
+
+	if err != nil {
+		log.Fatal("Could not read keyboard file")
+	}
+
+	return structure.NewKeyboard(keyboardData)
+}
+
 var address = flag.String("addr", "localhost:8000", "http service address")
 
 func main() {
@@ -63,32 +89,18 @@ func main() {
 
 	websocketPath := "/echo"
 
-	keyboardData, err := ioutil.ReadFile("keyboard/default.json")
+	keyboard := buildKeyboard("keyboard/default.json")
 
-	if err != nil {
-		log.Fatal("Could not read keyboard file")
-	}
+	pageData := &structure.PageData{Title: "Web remote", Address: *address + websocketPath, Keyboard: keyboard.GetJSON()}
 
-	keyboard := structure.NewKeyboard(keyboardData)
-
-	data := &structure.PageData{Title: "Web remote", Address: *address + websocketPath, Keyboard: keyboard.GetJSON()}
-
-	http.HandleFunc("/", mainHandler(data))
-	http.Handle("/js/", http.FileServer(http.Dir("public")))
+	handleWebServer(pageData)
 
 	messagesChan := make(chan structure.Message)
-	keyboardChan := make(chan []string)
-	mouseMoveChan := make(chan structure.Offset)
-	mouseClickChan := make(chan string)
 	commandsChan := make(chan string)
-
 	handleWebSocket(websocketPath, messagesChan)
-
-	go builder.Dispatcher(messagesChan, keyboardChan, mouseMoveChan, mouseClickChan)
-	go builder.KeyboardCommands(keyboardChan, commandsChan, keyboard)
-	go builder.MouseClickCommands(mouseClickChan, commandsChan)
-	go builder.MouseMoveCommands(mouseMoveChan, commandsChan)
+	handleMessageBuilders(messagesChan, commandsChan, keyboard)
 	go processor.ProcessCommands(commandsChan)
+
 	log.Printf("Starting listtening on %s... \n", *address)
 	log.Fatal(http.ListenAndServe(*address, nil))
 }

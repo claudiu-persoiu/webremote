@@ -2,8 +2,7 @@ package structure
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
+	"log"
 )
 
 type Key struct {
@@ -23,8 +22,7 @@ func NewKeyboard(rawJSON []byte) *Keyboard {
 
 	err := json.Unmarshal(rawJSON, &k.Keys)
 	if err != nil {
-		fmt.Println("Unable to decode JSON")
-		os.Exit(1)
+		log.Fatal("Unable to decode JSON")
 	}
 
 	return k
