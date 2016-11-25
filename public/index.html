@@ -89,11 +89,17 @@
             border: 1px solid #efefef!important
         }
 
+        .track-pad-container {
+            height: 200px;
+            width: 300px;
+            margin:auto;
+        }
+
         #track-pad {
             border-radius: 5px;
             background: #cccccc;
-            height: 200px;
-            width: 300px;
+            height: 100%;
+            width: 100%;
             margin:auto;
         }
 
@@ -117,7 +123,8 @@
             float: right;
             width: 35px;
             margin-top: 2px;
-            margin-right: 2px;
+            margin-right: 4px;
+
         }
 
         .scroll-buttons button {
@@ -140,11 +147,11 @@
 <div id="button-container">
   <div id="keyboard-container"></div>
   <div id="mouse-container">
-      <div>
+      <div class="track-pad-container">
+        <div class="scroll-buttons">
+            <button id="scroll-up"> </button><button id="scroll-down"> </button>
+        </div>
         <div id="track-pad">
-            <div class="scroll-buttons">
-                <button id="scroll-up"> </button><button id="scroll-down"> </button>
-            </div>
         </div>
       </div>
       <div class="buttons">
@@ -181,11 +188,11 @@
             });
         };
 
-        document.getElementById("button1").addEventListener("click", function () { mouseAction("1"); });
-        document.getElementById("button2").addEventListener("click", function () { mouseAction("2"); });
-        document.getElementById("button3").addEventListener("click", function () { mouseAction("3"); });
-        document.getElementById("scroll-up").addEventListener("click", function () { mouseAction("4"); });
-        document.getElementById("scroll-down").addEventListener("click", function () { mouseAction("5"); });
+        document.getElementById("button1").addEventListener("click", function () { mouseAction("1"); }, false);
+        document.getElementById("button2").addEventListener("click", function () { mouseAction("2"); }, false);
+        document.getElementById("button3").addEventListener("click", function () { mouseAction("3"); }, false);
+        document.getElementById("scroll-up").addEventListener("click", function () { mouseAction("4"); }, false);
+        document.getElementById("scroll-down").addEventListener("click", function () { mouseAction("5"); }, false);
     };
 
 </script>
