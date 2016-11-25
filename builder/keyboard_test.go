@@ -10,9 +10,10 @@ func TestKeyboardCommands(t *testing.T) {
 	inputCommands := [][]string{
 		[]string{"x"},
 		[]string{"y", "z"},
-		[]string{"&darr;"}}
+		[]string{"&darr;"},
+		[]string{"n/a"}, []string{"n/a", "x"}, []string{"x", "n/a"}}
 
-	expectedCommands := []string{"key x", "key y+z", "key Down"}
+	expectedCommands := []string{"key x", "key y+z", "key Down", "key x", "key x"}
 
 	keyboard := make(chan []string, len(inputCommands))
 	commands := make(chan string, len(inputCommands))

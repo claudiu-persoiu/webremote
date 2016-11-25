@@ -9,8 +9,14 @@ func KeyboardCommands(keyboardChan chan []string, commands chan string, keyboard
 		keyboardMessage := <-keyboardChan
 		command := ""
 		for _, key := range keyboardMessage {
-			command += dictionary(key) + "+"
+			filtered := dictionary(key)
+			if len(filtered) > 0 {
+				command += filtered + "+"
+			}
 		}
-		commands <- "key " + command[0:len(command)-1]
+
+		if len(command) > 0 {
+			commands <- "key " + command[0:len(command)-1]
+		}
 	}
 }
