@@ -3,15 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/claudiu-persoiu/webremote/builder"
-	"github.com/claudiu-persoiu/webremote/processor"
-	"github.com/claudiu-persoiu/webremote/structure"
 	"html/template"
 	"log"
 	"net/http"
 
+	"github.com/claudiu-persoiu/webremote/builder"
+	"github.com/claudiu-persoiu/webremote/processor"
+	"github.com/claudiu-persoiu/webremote/structure"
+	"github.com/gobuffalo/packr"
+
 	"golang.org/x/net/websocket"
-	"io/ioutil"
 )
 
 func handleWebSocket(path string, commands chan structure.Message) {
@@ -40,9 +41,17 @@ func handleWebSocket(path string, commands chan structure.Message) {
 	http.Handle(path, websocket.Handler(wsHandler))
 }
 
+var box = packr.NewBox("./public")
+var keyboardBox = packr.NewBox("./keyboard")
+
 func mainPageHandler(data *structure.PageData) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		t, err := template.ParseFiles("public/index.html")
+		b, err := box.FindString("index.html")
+		if err != nil {
+			log.Panic(err)
+		}
+
+		t, err := template.New("hello").Parse(b)
 
 		if err != nil {
 			log.Panic(err)
@@ -58,7 +67,7 @@ func mainPageHandler(data *structure.PageData) func(http.ResponseWriter, *http.R
 
 func handleWebServer(page *structure.PageData) {
 	http.HandleFunc("/", mainPageHandler(page))
-	http.Handle("/js/", http.FileServer(http.Dir("public")))
+	http.Handle("/js/", http.FileServer(box))
 }
 
 func handleMessageBuilders(messagesChan chan structure.Message, commandsChan chan string, keyboard *structure.Keyboard) {
@@ -73,13 +82,15 @@ func handleMessageBuilders(messagesChan chan structure.Message, commandsChan cha
 }
 
 func buildKeyboard(file string) *structure.Keyboard {
-	keyboardData, err := ioutil.ReadFile(file)
+	// keyboardData, err := ioutil.ReadFile(file)
+
+	keyboardData, err := keyboardBox.FindString(file)
 
 	if err != nil {
 		log.Fatal("Could not read keyboard file")
 	}
 
-	return structure.NewKeyboard(keyboardData)
+	return structure.NewKeyboard([]byte(keyboardData))
 }
 
 var address = flag.String("addr", "localhost:8000", "http service address")
@@ -89,7 +100,7 @@ func main() {
 
 	websocketPath := "/echo"
 
-	keyboard := buildKeyboard("keyboard/default.json")
+	keyboard := buildKeyboard("default.json")
 
 	pageData := &structure.PageData{Title: "Web remote", Address: *address + websocketPath, Keyboard: keyboard.GetJSON()}
 
