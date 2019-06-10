@@ -82,8 +82,6 @@ func handleMessageBuilders(messagesChan chan structure.Message, commandsChan cha
 }
 
 func buildKeyboard(file string) *structure.Keyboard {
-	// keyboardData, err := ioutil.ReadFile(file)
-
 	keyboardData, err := keyboardBox.FindString(file)
 
 	if err != nil {
