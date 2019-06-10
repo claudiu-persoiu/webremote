@@ -82,13 +82,13 @@ func handleMessageBuilders(messagesChan chan structure.Message, commandsChan cha
 }
 
 func buildKeyboard(file string) *structure.Keyboard {
-	keyboardData, err := keyboardBox.FindString(file)
+	keyboardData, err := keyboardBox.Find(file)
 
 	if err != nil {
 		log.Fatal("Could not read keyboard file")
 	}
 
-	return structure.NewKeyboard([]byte(keyboardData))
+	return structure.NewKeyboard(keyboardData)
 }
 
 var address = flag.String("addr", "localhost:8000", "http service address")
