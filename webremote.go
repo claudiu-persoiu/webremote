@@ -3,15 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/claudiu-persoiu/webremote/builder"
-	"github.com/claudiu-persoiu/webremote/processor"
-	"github.com/claudiu-persoiu/webremote/structure"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 
+	"github.com/claudiu-persoiu/webremote/builder"
+	"github.com/claudiu-persoiu/webremote/processor"
+	"github.com/claudiu-persoiu/webremote/structure"
+
 	"golang.org/x/net/websocket"
-	"io/ioutil"
 )
 
 func handleWebSocket(path string, commands chan structure.Message) {

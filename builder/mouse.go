@@ -1,8 +1,9 @@
 package builder
 
 import (
-	"github.com/claudiu-persoiu/webremote/structure"
 	"strconv"
+
+	"github.com/claudiu-persoiu/webremote/structure"
 )
 
 func MouseMoveCommands(mouseMove chan structure.Offset, commands chan string) {

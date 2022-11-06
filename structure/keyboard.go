@@ -22,7 +22,7 @@ func NewKeyboard(rawJSON []byte) *Keyboard {
 
 	err := json.Unmarshal(rawJSON, &k.Keys)
 	if err != nil {
-		log.Fatal("Unable to decode JSON")
+		log.Fatal("Unable to decode keyboard JSON")
 	}
 
 	return k
