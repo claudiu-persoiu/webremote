@@ -69,8 +69,8 @@ func handleMessageBuilders(messagesChan chan structure.Message, commandsChan cha
 
 	go builder.Dispatcher(messagesChan, keyboardChan, mouseMoveChan, mouseClickChan)
 	go builder.KeyboardCommands(keyboardChan, commandsChan, keyboard)
-	go builder.MouseClickCommands(mouseClickChan, commandsChan)
 	go builder.MouseMoveCommands(mouseMoveChan, commandsChan)
+	go builder.MouseClickCommands(mouseClickChan, commandsChan)
 }
 
 func buildKeyboard(file string) *structure.Keyboard {
