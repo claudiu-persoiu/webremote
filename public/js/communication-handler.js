@@ -1,7 +1,7 @@
-var communicationHandler = function (url, errorBlock) {
-    var socket, socketOpened = false;
+const communicationHandler = function (url, errorBlock) {
+    let socket, socketOpened = false;
 
-    var connect = function () {
+    const connect = function () {
         socket = new WebSocket(url);
 
         socket.onopen = function () {

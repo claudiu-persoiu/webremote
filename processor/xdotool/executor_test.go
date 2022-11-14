@@ -1,4 +1,4 @@
-package processor
+package xdotool
 
 import (
 	"fmt"
@@ -36,7 +36,7 @@ func TestProcessCommands(t *testing.T) {
 	commands := make(chan string, 1)
 	commands <- command
 
-	go ProcessCommands(commands)
+	go processCommands(commands)
 
 	time.Sleep(time.Millisecond + 10)
 	if lineToPrint != expectedResult {

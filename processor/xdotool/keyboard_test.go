@@ -1,9 +1,10 @@
-package builder
+package xdotool
 
 import (
-	"github.com/claudiu-persoiu/webremote/structure"
 	"testing"
 	"time"
+
+	"github.com/claudiu-persoiu/webremote/structure"
 )
 
 func TestKeyboardCommands(t *testing.T) {
@@ -24,7 +25,9 @@ func TestKeyboardCommands(t *testing.T) {
 
 	testKeyboard := []byte("[[{\"default\":\"x\",\"shift\":\"X\",\"caps\":\"X\"},{\"default\":\"y\",\"shift\":\"Y\",\"caps\":\"Y\"},{\"default\":\"z\",\"shift\":\"Z\",\"caps\":\"Z\"},{\"default\":\"&darr;\",\"execute\":\"Down\"}]]")
 
-	go KeyboardCommands(keyboard, commands, structure.NewKeyboard(testKeyboard))
+	b := Builder{commands: commands, keyboard: structure.NewKeyboard(testKeyboard)}
+
+	go b.KeyboardCommands(keyboard)
 
 	time.Sleep(time.Millisecond * 10)
 

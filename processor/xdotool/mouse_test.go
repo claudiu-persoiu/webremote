@@ -1,9 +1,10 @@
-package builder
+package xdotool
 
 import (
-	"github.com/claudiu-persoiu/webremote/structure"
 	"testing"
 	"time"
+
+	"github.com/claudiu-persoiu/webremote/structure"
 )
 
 func TestMouseMoveCommands(t *testing.T) {
@@ -19,7 +20,9 @@ func TestMouseMoveCommands(t *testing.T) {
 		mouseMove <- input
 	}
 
-	go MouseMoveCommands(mouseMove, commands)
+	b := Builder{commands: commands}
+
+	go b.MouseMoveCommands(mouseMove)
 
 	time.Sleep(time.Millisecond * 200)
 
@@ -43,7 +46,9 @@ func TestMouseClickCommands(t *testing.T) {
 		mouseMove <- input
 	}
 
-	go MouseClickCommands(mouseMove, commands)
+	b := Builder{commands: commands}
+
+	go b.MouseClickCommands(mouseMove)
 
 	time.Sleep(time.Millisecond * 200)
 

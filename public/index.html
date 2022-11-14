@@ -166,25 +166,30 @@
 <script src="js/touch-handler.js"></script>
 <script>
 
-    window.onload = function () {
-        var buttonContainer = document.getElementById("keyboard-container");
+    const feedback = function () {
+        if (typeof window.navigator.vibrate != "undefined") {
+            window.navigator.vibrate(50)
+        }
+    }
 
-        var errorBlock = document.getElementById("not-connected");
+    window.onload = function () {
+        const errorBlock = document.getElementById("not-connected");
+        const communication = communicationHandler("ws://{{.Address}}", errorBlock);
+        const buttonContainer = document.getElementById("keyboard-container");
 
         errorBlock.onclick = function () {
             communication.reconnect();
         };
 
-        var communication = communicationHandler("ws://{{.Address}}", errorBlock);
-
         keyboardHandler(communication, buttonContainer, JSON.parse({{.Keyboard}}));
 
         touchHandler(document.getElementById('track-pad'), communication);
 
-        var mouseAction = function (action) {
+        const mouseAction = function (action) {
+            feedback();
             communication.send({
-              type: "mouseclick",
-              commands: [action]
+                type: "mouseclick",
+                commands: [action]
             });
         };
 

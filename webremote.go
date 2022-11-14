@@ -10,6 +10,7 @@ import (
 
 	"github.com/claudiu-persoiu/webremote/builder"
 	"github.com/claudiu-persoiu/webremote/processor"
+	"github.com/claudiu-persoiu/webremote/processor/uinput"
 	"github.com/claudiu-persoiu/webremote/structure"
 
 	"golang.org/x/net/websocket"
@@ -62,15 +63,15 @@ func handleWebServer(page *structure.PageData) {
 	http.Handle("/js/", http.FileServer(http.Dir("public")))
 }
 
-func handleMessageBuilders(messagesChan chan structure.Message, commandsChan chan string, keyboard *structure.Keyboard) {
+func handleMessageBuilders(b processor.Processor, messagesChan chan structure.Message) {
 	keyboardChan := make(chan []string)
 	mouseMoveChan := make(chan structure.Offset)
 	mouseClickChan := make(chan string)
 
 	go builder.Dispatcher(messagesChan, keyboardChan, mouseMoveChan, mouseClickChan)
-	go builder.KeyboardCommands(keyboardChan, commandsChan, keyboard)
-	go builder.MouseMoveCommands(mouseMoveChan, commandsChan)
-	go builder.MouseClickCommands(mouseClickChan, commandsChan)
+	go b.KeyboardCommands(keyboardChan)
+	go b.MouseMoveCommands(mouseMoveChan)
+	go b.MouseClickCommands(mouseClickChan)
 }
 
 func buildKeyboard(file string) *structure.Keyboard {
@@ -83,7 +84,7 @@ func buildKeyboard(file string) *structure.Keyboard {
 	return structure.NewKeyboard(keyboardData)
 }
 
-var address = flag.String("addr", "localhost:8000", "http service address")
+var address = flag.String("addr", "192.168.1.215:8000", "http service address")
 
 func main() {
 	flag.Parse()
@@ -97,10 +98,13 @@ func main() {
 	handleWebServer(pageData)
 
 	messagesChan := make(chan structure.Message)
-	commandsChan := make(chan string)
 	handleWebSocket(websocketPath, messagesChan)
-	handleMessageBuilders(messagesChan, commandsChan, keyboard)
-	go processor.ProcessCommands(commandsChan)
+
+	//b := xdotool.NewBuilder(keyboard)
+	b := uinput.NewBuilder()
+	defer b.Close()
+
+	handleMessageBuilders(b, messagesChan)
 
 	log.Printf("Starting listtening on %s... \n", *address)
 	log.Fatal(http.ListenAndServe(*address, nil))

@@ -1,4 +1,4 @@
-package processor
+package xdotool
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 var execCommand = exec.Command
 var logLine = fmt.Println
 
-func ProcessCommands(commands chan string) {
+func processCommands(commands chan string) {
 	for {
 		command := <-commands
 		out, err := buildCommand("xdotool " + command)
