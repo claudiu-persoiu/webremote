@@ -11,6 +11,7 @@ import (
 	"github.com/claudiu-persoiu/webremote/builder"
 	"github.com/claudiu-persoiu/webremote/processor"
 	"github.com/claudiu-persoiu/webremote/processor/uinput"
+	"github.com/claudiu-persoiu/webremote/processor/xdotool"
 	"github.com/claudiu-persoiu/webremote/structure"
 
 	"golang.org/x/net/websocket"
@@ -85,6 +86,7 @@ func buildKeyboard(file string) *structure.Keyboard {
 }
 
 var address = flag.String("addr", "192.168.1.215:8000", "http service address")
+var exec = flag.String("exec", "uinput", "command executor, options are uinput and xdotool")
 
 func main() {
 	flag.Parse()
@@ -100,8 +102,17 @@ func main() {
 	messagesChan := make(chan structure.Message)
 	handleWebSocket(websocketPath, messagesChan)
 
-	//b := xdotool.NewBuilder(keyboard)
-	b := uinput.NewBuilder()
+	var b processor.Processor
+	switch *exec {
+	case "uinput":
+		b = uinput.NewBuilder()
+		break
+	case "xdotool":
+		b = xdotool.NewBuilder(keyboard)
+		break
+	default:
+		log.Fatal("Invalid command executor")
+	}
 	defer b.Close()
 
 	handleMessageBuilders(b, messagesChan)
