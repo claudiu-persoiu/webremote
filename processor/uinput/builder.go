@@ -1,10 +1,10 @@
 package uinput
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/bendahl/uinput"
+	"github.com/claudiu-persoiu/webremote/logger"
 	"github.com/claudiu-persoiu/webremote/structure"
 )
 
@@ -52,7 +52,6 @@ func (b *Builder) KeyboardCommands(keyboardChan chan []string) {
 func (b *Builder) MouseMoveCommands(mouseMoveChan chan structure.Offset) {
 	for {
 		offset := <-mouseMoveChan
-		//fmt.Println(offset)
 		if offset.X != 0 {
 			if offset.X > 0 {
 				b.mouse.MoveRight(int32(offset.X))
@@ -72,7 +71,7 @@ func (b *Builder) MouseMoveCommands(mouseMoveChan chan structure.Offset) {
 func (b *Builder) MouseClickCommands(mouseClickChan chan string) {
 	for {
 		action := <-mouseClickChan
-		fmt.Println(action)
+		logger.Log(action)
 		switch action {
 		case "1":
 			b.mouse.LeftClick()

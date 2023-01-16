@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/claudiu-persoiu/webremote/builder"
+	"github.com/claudiu-persoiu/webremote/logger"
 	"github.com/claudiu-persoiu/webremote/processor"
 	"github.com/claudiu-persoiu/webremote/processor/uinput"
 	"github.com/claudiu-persoiu/webremote/processor/xdotool"
@@ -21,9 +22,9 @@ import (
 func handleWebSocket(path string, commands chan structure.Message) {
 
 	wsHandler := func(ws *websocket.Conn) {
-		fmt.Println("connect")
+		logger.Log("connect")
 		defer func() {
-			log.Println("closing client")
+			logger.Log("closing client")
 			ws.Close()
 		}()
 
@@ -32,11 +33,11 @@ func handleWebSocket(path string, commands chan structure.Message) {
 			err := websocket.JSON.Receive(ws, msg)
 
 			if err != nil {
-				log.Println(err)
+				logger.Log(err)
 				return
 			}
-			fmt.Println(msg)
-			fmt.Printf("Receive: %s\n", msg.Commands)
+			logger.Log(msg)
+			logger.Log("Receive: %s\n", msg.Commands)
 			commands <- *msg
 		}
 	}
@@ -101,11 +102,13 @@ func getOutboundIP() net.IP {
 
 var port = flag.String("port", "8765", "http service port")
 var exec = flag.String("exec", "uinput", "command executor, options are uinput and xdotool")
+var verbose = flag.Bool("verbose", false, "make verbose")
 
 func main() {
 	flag.Parse()
 
 	websocketPath := "/echo"
+	logger.SetVerbose(*verbose)
 
 	keyboard := buildKeyboard("keyboard/default.json")
 

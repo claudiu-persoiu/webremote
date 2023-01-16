@@ -1,13 +1,14 @@
 package xdotool
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/claudiu-persoiu/webremote/logger"
 )
 
 var execCommand = exec.Command
-var logLine = fmt.Println
+var logLine = logger.Log
 
 func processCommands(commands chan string) {
 	for {
