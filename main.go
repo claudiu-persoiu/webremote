@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 
 	"github.com/claudiu-persoiu/webremote/builder"
@@ -85,7 +86,20 @@ func buildKeyboard(file string) *structure.Keyboard {
 	return structure.NewKeyboard(keyboardData)
 }
 
-var address = flag.String("addr", "192.168.1.215:8000", "http service address")
+// Get preferred outbound ip of this machine
+func getOutboundIP() net.IP {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+	return localAddr.IP
+}
+
+var port = flag.String("port", "8765", "http service port")
 var exec = flag.String("exec", "uinput", "command executor, options are uinput and xdotool")
 
 func main() {
@@ -95,7 +109,7 @@ func main() {
 
 	keyboard := buildKeyboard("keyboard/default.json")
 
-	pageData := &structure.PageData{Title: "Web remote", Address: *address + websocketPath, Keyboard: keyboard.GetJSON()}
+	pageData := &structure.PageData{Title: "Web remote", Address: *port + websocketPath, Keyboard: keyboard.GetJSON()}
 
 	handleWebServer(pageData)
 
@@ -117,6 +131,7 @@ func main() {
 
 	handleMessageBuilders(b, messagesChan)
 
-	log.Printf("Starting listtening on %s... \n", *address)
-	log.Fatal(http.ListenAndServe(*address, nil))
+	address := fmt.Sprintf("%s:%s", getOutboundIP(), *port)
+	log.Printf("Starting listtening on %s... \n", address)
+	log.Fatal(http.ListenAndServe(address, nil))
 }

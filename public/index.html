@@ -174,7 +174,9 @@
 
     window.onload = function () {
         const errorBlock = document.getElementById("not-connected");
-        const communication = communicationHandler("ws://{{.Address}}", errorBlock);
+        const location = window.location;
+        const path = `${location.protocol === 'https:' ? 'wss' : 'ws'}:/`+`/${location.host + location.pathname}echo`;
+        const communication = communicationHandler(path, errorBlock);
         const buttonContainer = document.getElementById("keyboard-container");
 
         errorBlock.onclick = function () {
