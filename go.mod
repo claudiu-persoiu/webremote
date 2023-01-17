@@ -1,6 +1,6 @@
 module github.com/claudiu-persoiu/webremote
 
-go 1.12
+go 1.16
 
 require (
 	github.com/bendahl/uinput v1.6.0

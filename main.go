@@ -1,10 +1,10 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -47,10 +47,10 @@ func handleWebSocket(path string, commands chan structure.Message) {
 
 func mainPageHandler(data *structure.PageData) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		t, err := template.ParseFiles("public/index.html")
+		t, err := template.ParseFS(templateBox, "template/index.html")
 
 		if err != nil {
-			log.Panic(err)
+			log.Fatal(err)
 		}
 
 		err = t.Execute(w, *data)
@@ -61,9 +61,18 @@ func mainPageHandler(data *structure.PageData) func(http.ResponseWriter, *http.R
 	}
 }
 
+//go:embed public
+var publicBox embed.FS
+
+//go:embed template
+var templateBox embed.FS
+
+//go:embed keyboard
+var keyboardBox embed.FS
+
 func handleWebServer(page *structure.PageData) {
 	http.HandleFunc("/", mainPageHandler(page))
-	http.Handle("/js/", http.FileServer(http.Dir("public")))
+	http.Handle("/public/", http.FileServer(http.FS(publicBox)))
 }
 
 func handleMessageBuilders(b processor.Processor, messagesChan chan structure.Message) {
@@ -78,7 +87,7 @@ func handleMessageBuilders(b processor.Processor, messagesChan chan structure.Me
 }
 
 func buildKeyboard(file string) *structure.Keyboard {
-	keyboardData, err := ioutil.ReadFile(file)
+	keyboardData, err := keyboardBox.ReadFile(file)
 
 	if err != nil {
 		log.Fatal("Could not read keyboard file")
