@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/claudiu-persoiu/webremote/builder"
 	"github.com/claudiu-persoiu/webremote/logger"
@@ -144,6 +145,9 @@ func main() {
 	handleMessageBuilders(b, messagesChan)
 
 	address := fmt.Sprintf("%s:%s", getOutboundIP(), *port)
-	log.Printf("Starting listtening on %s... \n", address)
-	log.Fatal(http.ListenAndServe(address, nil))
+	fmt.Printf("Starting listtening on...\n http://%s... \n", address)
+	if host, err := os.Hostname(); err == nil {
+		fmt.Printf(" http://%s:%s... \n", host, *port)
+	}
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *port), nil))
 }
