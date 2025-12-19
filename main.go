@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/claudiu-persoiu/webremote/builder"
 	"github.com/claudiu-persoiu/webremote/logger"
@@ -113,21 +114,12 @@ func getOutboundIP() net.IP {
 var port = flag.String("port", "8765", "http service port")
 var exec = flag.String("exec", "uinput", "command executor, options are uinput and xdotool")
 var verbose = flag.Bool("verbose", false, "make verbose")
+var jiggler = flag.Bool("jiggler", false, "just jiggle the mouse to prevent sleep")
 
 func main() {
 	flag.Parse()
 
-	websocketPath := "/echo"
-	logger.SetVerbose(*verbose)
-
 	keyboard := buildKeyboard("keyboard/default.json")
-
-	pageData := &structure.PageData{Title: "Web remote", Address: *port + websocketPath, Keyboard: keyboard.GetJSON()}
-
-	handleWebServer(pageData)
-
-	messagesChan := make(chan structure.Message)
-	handleWebSocket(websocketPath, messagesChan)
 
 	var b processor.Processor
 	switch *exec {
@@ -142,12 +134,39 @@ func main() {
 	}
 	defer b.Close()
 
-	handleMessageBuilders(b, messagesChan)
+	if *jiggler {
+		fmt.Println("Starting mouse jiggler...")
+		go func() {
+			mouseMoveChan := make(chan structure.Offset)
+			go b.MouseMoveCommands(mouseMoveChan)
+			for {
+				mouseMoveChan <- structure.Offset{X: 10, Y: 10}
+				mouseMoveChan <- structure.Offset{X: -10, Y: -10}
+				// Sleep for a minute
+				select {
+				case <-time.After(10 * time.Second):
+				}
+			}
+		}()
+		fmt.Scanln()
+	} else {
+		websocketPath := "/echo"
+		logger.SetVerbose(*verbose)
 
-	address := fmt.Sprintf("%s:%s", getOutboundIP(), *port)
-	fmt.Printf("Starting listtening on...\n http://%s... \n", address)
-	if host, err := os.Hostname(); err == nil {
-		fmt.Printf(" http://%s:%s... \n", host, *port)
+		pageData := &structure.PageData{Title: "Web remote", Address: *port + websocketPath, Keyboard: keyboard.GetJSON()}
+
+		handleWebServer(pageData)
+
+		messagesChan := make(chan structure.Message)
+		handleWebSocket(websocketPath, messagesChan)
+
+		handleMessageBuilders(b, messagesChan)
+
+		address := fmt.Sprintf("%s:%s", getOutboundIP(), *port)
+		fmt.Printf("Starting listening on...\n http://%s... \n", address)
+		if host, err := os.Hostname(); err == nil {
+			fmt.Printf(" http://%s:%s... \n", host, *port)
+		}
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *port), nil))
 	}
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *port), nil))
 }
