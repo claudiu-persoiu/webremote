@@ -19,7 +19,7 @@ func fakeExecCommand(command string, args ...string) *exec.Cmd {
 func TestProcessCommands(t *testing.T) {
 	lineToPrint := ""
 	execCommand = fakeExecCommand
-	logLine = func(lines ...interface{}) (int, error) {
+	logLine = func(lines ...any) (int, error) {
 		if line, ok := lines[len(lines)-1].(string); ok {
 			lineToPrint = line
 		}

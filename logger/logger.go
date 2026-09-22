@@ -8,7 +8,7 @@ func SetVerbose(v bool) {
 	verbose = v
 }
 
-func Log(a ...interface{}) (int, error) {
+func Log(a ...any) (int, error) {
 	if verbose {
 		return fmt.Println(a...)
 	}
